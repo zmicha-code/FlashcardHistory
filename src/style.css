@@ -43,3 +43,7 @@ body,
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+button.rn-button::before {
+  content: none;
+}

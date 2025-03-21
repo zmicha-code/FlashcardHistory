@@ -8,7 +8,9 @@ import {
   useSyncedStorageState,
   QueueInteractionScore,
 } from "@remnote/plugin-sdk";
-import { HistoryData, timeSince } from '../types';
+import MyRemNoteButton from '../components/MyRemNoteButton';
+import { HistoryData } from "../types/HistoryData";
+import { timeSince } from '../utils/TimeAndDate';
 
 const NUM_TO_LOAD_IN_BATCH = 20;
 
@@ -58,16 +60,25 @@ function cardHistorySidebar() {
   // Rendering Logic
   return (
     <div
-      className="h-full w-full overflow-y-auto rn-clr-background-primary"
+      className="h-full w-full overflow-y-auto rn-clr-background-primary hover:bg-gray-400"
       //This stops the mouseDown event from “bubbling up” to parent elements. For example, clicking in the sidebar won’t trigger actions in the main app, keeping interactions isolated.
       onMouseDown={(e) => e.stopPropagation()} // What does this do?
     >
-        {/* This is conditional rendering in JSX. */}
+      {/* Toolbar with Reset Button */}
+      <div className="p-2 flex justify-end">
+      <MyRemNoteButton
+        img="M3.32104 8.64925C3.32104 9.29895 3.44155 9.90847 3.68257 10.4778C3.92708 11.0437 4.2624 11.5414 4.68854 11.9711C5.11469 12.4007 5.61069 12.7343 6.17655 12.9718C6.74591 13.2128 7.35543 13.3333 8.00513 13.3333C8.65133 13.3333 9.25736 13.2128 9.82322 12.9718C10.3891 12.7343 10.8868 12.4007 11.3165 11.9711C11.7461 11.5414 12.0797 11.0437 12.3172 10.4778C12.5582 9.90847 12.6787 9.29895 12.6787 8.64925C12.6787 8.49207 12.6298 8.36458 12.532 8.26677C12.4377 8.16897 12.312 8.12007 12.1548 8.12007C12.0046 8.12007 11.8823 8.16897 11.788 8.26677C11.6972 8.36458 11.6518 8.49207 11.6518 8.64925C11.6518 9.15573 11.5575 9.63078 11.3689 10.0744C11.1802 10.5145 10.9183 10.904 10.5829 11.2428C10.2511 11.5781 9.86339 11.8401 9.41978 12.0287C8.97967 12.2138 8.50811 12.3064 8.00513 12.3064C7.49515 12.3064 7.02011 12.2138 6.57999 12.0287C6.13988 11.8401 5.75216 11.5781 5.41683 11.2428C5.085 10.904 4.82477 10.5145 4.63615 10.0744C4.44753 9.63078 4.35322 9.15573 4.35322 8.64925C4.35322 8.13928 4.44578 7.66249 4.63091 7.21888C4.81953 6.77527 5.07976 6.38755 5.41159 6.05572C5.74342 5.72039 6.12765 5.45842 6.56427 5.2698C7.00439 5.08118 7.47943 4.98687 7.98941 4.98687C8.16056 4.98687 8.32473 4.9956 8.48192 5.01307C8.6391 5.02704 8.78406 5.04799 8.91679 5.07594L7.49166 6.48535C7.44625 6.53426 7.40957 6.5884 7.38163 6.64778C7.35718 6.70367 7.34495 6.76479 7.34495 6.83116C7.34495 6.97437 7.39385 7.09488 7.49166 7.19268C7.58946 7.29049 7.70822 7.33939 7.84794 7.33939C7.99814 7.33939 8.11865 7.29223 8.20946 7.19792L10.3576 5.02878C10.4135 4.9729 10.4537 4.91352 10.4782 4.85064C10.5061 4.78777 10.5201 4.7214 10.5201 4.65154C10.5201 4.50484 10.4659 4.37909 10.3576 4.2743L8.20946 2.0842C8.11515 1.9864 7.99465 1.9375 7.84794 1.9375C7.70473 1.9375 7.58422 1.98815 7.48642 2.08944C7.39211 2.18725 7.34495 2.3095 7.34495 2.45621C7.34495 2.52257 7.35718 2.58545 7.38163 2.64483C7.40608 2.70072 7.44101 2.75311 7.48642 2.80201L8.75437 4.05424C8.63561 4.02979 8.51161 4.01058 8.38237 3.99661C8.25662 3.98264 8.12563 3.97565 7.98941 3.97565C7.33971 3.97565 6.73194 4.09791 6.16607 4.34241C5.6037 4.58343 5.10945 4.91701 4.68331 5.34315C4.25716 5.76929 3.92358 6.2653 3.68257 6.83116C3.44155 7.39702 3.32104 8.00305 3.32104 8.64925Z"
+        text="Reset Flashcards"
+        onClick={() => setRemData([])}
+      />
+      </div>
+      {/* Notification (no flashcards) */}
       {remData.length == 0 && (
         <div className="rn-clr-content-primary">
           Do more flashcards.
         </div>
       )}
+      {/* List of flashcards */}
       {/*Slice a fraction of the history to be displayed. map((data, i) => ...) loops over those items, rendering a <RemHistoryItem> for each one. data is the item, i is its index in the sliced array.*/}
       {remData.slice(0, NUM_TO_LOAD_IN_BATCH * numLoaded).map((data, i) => (
         <RemHistoryItem
@@ -78,6 +89,7 @@ function cardHistorySidebar() {
           closeIndex={() => closeIndex(i)}
         />
       ))}
+      {/* Load more */}
       {numUnloaded > 0 && (
         <div
           onMouseOver={() => setNumLoaded((i) => i + 1)}

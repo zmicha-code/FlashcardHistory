@@ -4,9 +4,10 @@ import {
   ReactRNPlugin,
   RemId,
   WidgetLocation,
-  AppEvents
+  AppEvents,
+  useTracker
 } from '@remnote/plugin-sdk';
-import { HistoryData } from '../types';
+import { HistoryData } from "../types/HistoryData";
 import '../style.css';
 import '../App.css';
 
@@ -30,20 +31,15 @@ async function onActivate(plugin: ReactRNPlugin) {
   plugin.event.addListener( AppEvents.QueueCompleteCard,
     undefined,
     async (message) => {
-      // Log the entire message object to see its structure
-      console.log("QueueCompleteCard message:", message);
-
       //const currentRemId = message.remId as RemId;
-
       const cardId = message.cardId as string;
+
       // Fetch the card and get its remId
       const card = await plugin.card.findOne(cardId);
       const currentRemId = card?.remId as RemId;
 
       //
       const currentScore = card?.repetitionHistory?.[card?.repetitionHistory?.length-1]?.score;
-
-      console.log("Current Score: " + currentScore);
     
       //const currentRemData = (await plugin.storage.getSynced("remData")) || [];
       const currentRemData: HistoryData[] = (await plugin.storage.getSynced("cardData")) || [];
