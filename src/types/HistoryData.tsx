@@ -9,4 +9,5 @@ export interface HistoryData {
   open: boolean;
   time: number;
   score: QueueInteractionScore;
+  question: string;
 }

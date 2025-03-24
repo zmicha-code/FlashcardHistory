@@ -5,11 +5,22 @@ import {
   RemId,
   WidgetLocation,
   AppEvents,
-  useTracker
+  useTracker, Rem, RichTextInterface, RichTextElementInterface
 } from '@remnote/plugin-sdk';
 import { HistoryData } from "../types/HistoryData";
 import '../style.css';
 import '../App.css';
+
+function extractText(textArray: RichTextInterface): string {
+  return textArray.reduce((acc: string, curr: RichTextElementInterface) => {
+    if (typeof curr === 'string') {
+      return acc + curr; // Direkter String wird angehängt
+    } else if (curr && 'text' in curr) {
+      return acc + (curr.text || ''); // Text aus dem Objekt wird angehängt
+    }
+    return acc; // Andere Fälle werden ignoriert
+  }, '');
+}
 
 async function onActivate(plugin: ReactRNPlugin) {
 
@@ -18,6 +29,7 @@ async function onActivate(plugin: ReactRNPlugin) {
     WidgetLocation.RightSidebar,
     {
       dimensions: { height: "auto", width: "100%" },
+      widgetTabTitle: "Flashcard History", // not working?
       widgetTabIcon: "https://i.imgur.com/MLaBDJw.png",
     }
   );
@@ -38,8 +50,12 @@ async function onActivate(plugin: ReactRNPlugin) {
       const card = await plugin.card.findOne(cardId);
       const currentRemId = card?.remId as RemId;
 
+      //console.log(await card?.getRem())
+
       //
       const currentScore = card?.repetitionHistory?.[card?.repetitionHistory?.length-1]?.score;
+
+      const r = await card?.getRem();
     
       //const currentRemData = (await plugin.storage.getSynced("remData")) || [];
       const currentRemData: HistoryData[] = (await plugin.storage.getSynced("cardData")) || [];
@@ -49,7 +65,9 @@ async function onActivate(plugin: ReactRNPlugin) {
                                                       remId: currentRemId,
                                                       open: false,
                                                       time: new Date().getTime(),
-                                                      score : currentScore},
+                                                      score : currentScore,
+                                                      question: extractText(r?.text || [])
+                                                    },
                                                     ...currentRemData,]);
       }
     });
