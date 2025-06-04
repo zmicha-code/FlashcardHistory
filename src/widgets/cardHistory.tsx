@@ -122,23 +122,6 @@ function cardHistorySidebar() {
         onClick={() => setRemData([])}
       />
       </div>
-      {/* Notification (no flashcards) */}
-      {filteredData.length == 0 && (
-        <div className="rn-clr-content-primary">
-          {selectedScore != null ? `No flashcards with score ${scoreToLabel[selectedScore]}.` : "No flashcards in history."}
-        </div>
-      )}
-      {/* List of flashcards */}
-      {/*Slice a fraction of the history to be displayed. map((data, i) => ...) loops over those items, rendering a <RemHistoryItem> for each one. data is the item, i is its index in the sliced array.*/}
-      {filteredData.slice(0, NUM_TO_LOAD_IN_BATCH * numLoaded).map((data, i) => (
-        <RemHistoryItem
-          data={data}
-          remId={data.remId}
-          key={data.key || Math.random()}
-          setData={(c) => updateData(data.remId, c)}
-          closeIndex={() => removeFlashcard(data.remId)}
-        />
-      ))}
       {/* Toolbar Bottom*/}
       <div className="p-2 flex justify-end">
         {/* 
@@ -163,6 +146,27 @@ function cardHistorySidebar() {
             text=""
             onClick={() => setSearchQuery("")}
           />
+      </div>
+      {/* Notification (no flashcards) */}
+      {filteredData.length == 0 && (
+        <div className="rn-clr-content-primary">
+          {selectedScore != null ? `No flashcards with score ${scoreToLabel[selectedScore]}.` : "No flashcards in history."}
+        </div>
+      )}
+      {/* List of flashcards */}
+      {/*Slice a fraction of the history to be displayed. map((data, i) => ...) loops over those items, rendering a <RemHistoryItem> for each one. data is the item, i is its index in the sliced array.*/}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, }}>
+        <div style={{ width: "100%", maxHeight: "100%", overflowY: "scroll", margin: "5px" }}>
+        {filteredData.slice(0, NUM_TO_LOAD_IN_BATCH * numLoaded).map((data, i) => (
+          <RemHistoryItem
+            data={data}
+            remId={data.remId}
+            key={data.key || Math.random()}
+            setData={(c) => updateData(data.remId, c)}
+            closeIndex={() => removeFlashcard(data.remId)}
+          />
+        ))}
+        </div>
       </div>
     </div>
   );
